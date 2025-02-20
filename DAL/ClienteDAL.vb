@@ -5,7 +5,7 @@ Imports Examen.Utils
 Public Class ClienteDAL
 
     Private Shared connectionString As String = ConfigurationManager.ConnectionStrings("connection").ConnectionString
-
+    '
     Public Shared Function VerClientes() As List(Of Cliente)
 
         Try
