@@ -1,5 +1,4 @@
 ﻿Imports System.Data.SqlClient
-Imports Examen.Utils
 
 Public Class ProductoDAL
 
@@ -69,9 +68,8 @@ Public Class ProductoDAL
     Public Shared Function EliminarProducto(id As Integer) As RespuestaModel(Of Producto)
 
         Try
-
-            Dim conn As New SqlConnection(connectionString)
             Dim productoEliminado As Producto = Nothing
+            Dim conn As New SqlConnection(connectionString)
             conn.Open()
             Dim selectQuery As String = "SELECT ID, Nombre, Precio, Categoria FROM productos WHERE ID = @ID"
             Dim selectCmd As New SqlCommand(selectQuery, conn)
@@ -102,6 +100,32 @@ Public Class ProductoDAL
         Catch err As Exception
             Console.WriteLine($"Error => ", err.Message)
 
+        End Try
+
+    End Function
+
+    Public Shared Function ModificarProducto(producto As Producto) As RespuestaModel(Of Producto)
+
+        Try
+            Dim filasAfectadas As Integer = 0
+            Dim conn As New SqlConnection(connectionString)
+            conn.Open()
+            Dim query As String = "UPDATE productos SET Nombre = @Nombre, Precio = @Precio, Categoria = @Categoria WHERE ID = @ID"
+            Dim cmd As New SqlCommand(query, conn)
+            cmd.Parameters.AddWithValue("@ID", producto.ID)
+            cmd.Parameters.AddWithValue("@Nombre", producto.Nombre)
+            cmd.Parameters.AddWithValue("@Precio", producto.Precio)
+            cmd.Parameters.AddWithValue("@Categoria", producto.Categoria)
+            filasAfectadas = cmd.ExecuteNonQuery()
+
+            If filasAfectadas > 0 Then
+                Return New RespuestaModel(Of Producto)(True, producto)
+            End If
+
+            Return New RespuestaModel(Of Producto)(False, Nothing)
+
+        Catch err As Exception
+            Console.WriteLine("Error al modificar el cliente: " & err.Message)
         End Try
 
     End Function

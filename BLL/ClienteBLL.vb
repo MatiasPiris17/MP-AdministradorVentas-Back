@@ -21,6 +21,11 @@ Public Class ClienteBLL
 
     End Function
 
+    Public Shared Function BuscarClientes(id As Integer) As Cliente
+        Dim clientes As List(Of Cliente) = ClienteDAL.VerClientes()
+        Return clientes.FirstOrDefault(Function(c) c.ID = id)
+    End Function
+
     Public Shared Function AltaCliente(cliente As String, telefono As String, correo As String) As Cliente
         Dim nuevoCliente = New Cliente With {
             .Cliente = cliente,
@@ -59,6 +64,38 @@ Public Class ClienteBLL
             Console.WriteLine(err.Message)
         End Try
 
+
+    End Function
+
+
+    Public Shared Function EditarCliente(id As Integer, cliente As String, telefono As String, correo As String) As Cliente
+        Try
+            Dim editar = New Cliente() With {
+                        .ID = id,
+                        .Cliente = cliente,
+                        .Telefono = telefono,
+                        .Correo = correo
+            }
+            Console.WriteLine($" ID: {editar.ID}, Cliente: {editar.Cliente}, Telefono: {editar.Telefono}, Correo: {editar.Correo}")
+
+
+            Dim modificacionCliente As RespuestaModel(Of Cliente) = ClienteDAL.ModificarCliente(editar)
+
+            Console.WriteLine(modificacionCliente.Estado)
+
+            If modificacionCliente.Estado Then
+                Dim clienteEditado = BuscarClientes(modificacionCliente.Resultado.ID)
+
+                Console.Write($"Cliente editado con exito.")
+                Console.Write($" ID: {clienteEditado.ID}, Cliente: {clienteEditado.Cliente}, Telefono: {clienteEditado.Telefono}, Correo: {clienteEditado.Correo}")
+                Return clienteEditado
+            Else
+                Throw New Exception("El cliente no se pudo editar")
+            End If
+
+        Catch err As Exception
+            Console.WriteLine(err.Message)
+        End Try
 
     End Function
 End Class

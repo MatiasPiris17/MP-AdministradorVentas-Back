@@ -1,5 +1,4 @@
-﻿Imports Examen.Utils
-
+﻿
 Public Class ProductoBLL
 
     Public Shared Function BuscarProductos() As List(Of Producto)
@@ -7,11 +6,8 @@ Public Class ProductoBLL
 
         If productos IsNot Nothing AndAlso productos.Count > 0 Then
             For Each producto As Producto In productos
-
                 Console.WriteLine($"ID: {producto.ID}, Nombre: {producto.Nombre}, Precio: {producto.Precio}, Categoria: {producto.Categoria}")
-
             Next
-
         Else
             Console.WriteLine("No se encontraron clientes.")
         End If
@@ -19,6 +15,12 @@ Public Class ProductoBLL
         Return productos
 
     End Function
+
+    Public Shared Function BuscarProductoID(id As Integer) As Producto
+        Dim productos As List(Of Producto) = ProductoDAL.VerProductos()
+        Return productos.FirstOrDefault(Function(c) c.ID = id)
+    End Function
+
 
     Public Shared Function AltaProducto(nombre As String, precio As Double, categoria As String) As Producto
         Dim nuevoProducto = New Producto With {
@@ -61,6 +63,32 @@ Public Class ProductoBLL
         Catch err As Exception
             Console.WriteLine(err.Message)
         End Try
+    End Function
+
+    Public Shared Function EditarProducto(id As Integer, nombre As String, precio As Double, categoria As String) As Producto
+        Try
+            Dim editar = New Producto() With {
+            .ID = id,
+            .Nombre = nombre,
+            .Precio = precio,
+            .Categoria = categoria
+            }
+            Dim modificacionProducto As RespuestaModel(Of Producto) = ProductoDAL.ModificarProducto(editar)
+
+            If modificacionProducto.Estado Then
+                Dim productoEditado = BuscarProductoID(modificacionProducto.Resultado.ID)
+
+                Console.Write($"Cliente editado con exito.")
+                Console.Write($" ID: {productoEditado.ID}, Nombre: {productoEditado.Nombre}, Precio: {productoEditado.Precio}, Categoria: {productoEditado.Categoria}")
+                Return productoEditado
+            Else
+                Throw New Exception("El cliente no se pudo editar")
+            End If
+
+        Catch err As Exception
+            Console.WriteLine(err.Message)
+        End Try
+
     End Function
 
 End Class

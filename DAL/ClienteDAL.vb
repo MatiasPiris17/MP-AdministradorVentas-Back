@@ -110,5 +110,33 @@ Public Class ClienteDAL
     End Function
 
 
+    Public Shared Function ModificarCliente(cliente As Cliente) As RespuestaModel(Of Cliente)
+
+        Try
+            Dim filasAfectadas As Integer = 0
+            Dim conn As New SqlConnection(connectionString)
+            conn.Open()
+
+            Dim query As String = "UPDATE clientes SET Cliente = @Cliente, Telefono = @Telefono, Correo = @Correo WHERE ID = @ID"
+            Dim cmd As New SqlCommand(query, conn)
+            cmd.Parameters.AddWithValue("@ID", cliente.ID)
+            cmd.Parameters.AddWithValue("@Cliente", cliente.Cliente)
+            cmd.Parameters.AddWithValue("@Telefono", cliente.Telefono)
+            cmd.Parameters.AddWithValue("@Correo", cliente.Correo)
+            filasAfectadas = cmd.ExecuteNonQuery()
+
+            If filasAfectadas > 0 Then
+                Console.WriteLine(filasAfectadas)
+                Return New RespuestaModel(Of Cliente)(True, cliente)
+            End If
+
+            Console.WriteLine("No se encontró el cliente para modificar.")
+            Return New RespuestaModel(Of Cliente)(False, Nothing)
+        Catch err As Exception
+            Console.WriteLine("Error al modificar el cliente: " & err.Message)
+        End Try
+
+
+    End Function
 
 End Class
